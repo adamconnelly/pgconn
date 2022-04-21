@@ -211,7 +211,7 @@ func connect(ctx context.Context, config *Config, fallbackConfig *FallbackConfig
 	network, address := NetworkAddress(fallbackConfig.Host, fallbackConfig.Port)
 	pgConn.conn, err = config.DialFunc(ctx, network, address)
 	if err != nil {
-		return nil, &connectError{config: config, msg: "dial error", err: err}
+		return nil, &connectError{config: config, msg: "dial error", err: err, isBadConn: true}
 	}
 
 	pgConn.parameterStatuses = make(map[string]string)
