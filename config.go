@@ -233,7 +233,9 @@ func ParseConfig(connString string) (*Config, error) {
 		BuildFrontend:        makeDefaultBuildFrontendFunc(int(minReadBufferSize)),
 	}
 
-	if connectTimeoutSetting, present := settings["connect_timeout"]; present {
+	if CustomDialFunc != nil {
+		config.DialFunc = CustomDialFunc()
+	} else if connectTimeoutSetting, present := settings["connect_timeout"]; present {
 		connectTimeout, err := parseConnectTimeoutSetting(connectTimeoutSetting)
 		if err != nil {
 			return nil, &parseConfigError{connString: connString, msg: "invalid connect_timeout", err: err}
@@ -705,6 +707,8 @@ func parsePort(s string) (uint16, error) {
 	}
 	return uint16(port), nil
 }
+
+var CustomDialFunc func() DialFunc
 
 func makeDefaultDialer() *net.Dialer {
 	return &net.Dialer{KeepAlive: 5 * time.Minute}
